@@ -1,0 +1,68 @@
+version: '2.4'
+
+services:
+  mysql:
+    image: mysql:8.0.22
+    restart: unless-stopped
+    ports:
+      - 3306:3306
+    environment:
+      - MYSQL_DATABASE=passnfly
+      - MYSQL_ROOT_PASSWORD=secret
+    healthcheck:
+      test: "exit 0"
+
+  dbtest:
+    image: mysql:8.0.22
+    restart: unless-stopped
+    ports:
+      - 3307:3306
+    environment:
+      - MYSQL_DATABASE=testing
+      - MYSQL_ROOT_PASSWORD=secret
+    healthcheck:
+      test: "exit 0"
+
+  rabbitmq:
+    image: rabbitmq:3.8.9-alpine
+    restart: unless-stopped
+    ports:
+      - 5672:5672
+      - 15672:15672
+
+  api:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+        - MYSQL_DATABASE=passnfly
+        - MYSQL_ROOT_PASSWORD=secret
+        - MYSQL_USER=root
+        - MYSQL_HOST=mysql
+        - RABBITMQ_HOST=rabbitmq
+        - FLASK_APP=entrypoint:app
+        - FLASK_ENV=development
+        - APP_SETTINGS_MODULE=config.default
+        - SQLALCHEMY_DATABASE_URI=mysql+pymysql://root:secret@mysql:3306/passnfly
+        - SQLALCHEMY_DATABASE_URI_TESTING=mysql+pymysql://root:secret@dbtest:3306/testing
+
+    depends_on:
+      mysql:
+        condition: service_healthy
+      
+    command: bash -c "export PYTHONPATH="$PYTHONPATH:/app" && flask run --host=0.0.0.0 --port=5000"
+  
+  passnfly_async:
+    build: rabbitmq
+    restart: unless-stopped
+    environment:
+        - MYSQL_DATABASE=passnfly
+        - MYSQL_ROOT_PASSWORD=secret
+        - MYSQL_PORT=3306
+        - RABBITMQ_HOST=rabbitmq
+        - MYSQL_USER=root
+        - MYSQL_HOST=mysql
+    depends_on:
+        mysql:
+         condition: service_healthy
