@@ -8,8 +8,8 @@ docker-compose build
 docker-compose up
 
 ## run migrations 
-docker exec -it container_name flask db init
-docker exec -it container_name flask db migrate -m "whatever"
+docker exec -it container_name flask db init  
+docker exec -it container_name flask db migrate -m "whatever"  
 docker exec -it container_name flask db upgrade
   
 ## run tests
