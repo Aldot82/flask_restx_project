@@ -1,6 +1,4 @@
 from io import BytesIO
-import json
-from unittest.mock import patch
 
 
 def test_get_all(test_client):
@@ -54,13 +52,6 @@ def test_upload(test_client):
     assert 201 == response.status_code
 
 
-def test_send_task(test_client):
-    response = test_client.post("/airports/add-task/create", json=airport)
-    data = response.json
-    assert 200 == response.status_code
-    assert 'Task sent to the worker' == data
-
-
 def test_webhook(test_client):
     response = test_client.post('/airports/webhook', json=airport)
     assert 200 == response.status_code
@@ -84,19 +75,3 @@ airport = {
     }
 
 airport_update = {"name": "Airport updated", "city": "new city"}
-
-airport_task = {
-        "name": "Airport task",
-        "city": "A city",
-        "country": "A country",
-        "iata": "IATA",
-        "icao": "ICAO",
-        "latitude": 1.1,
-        "longitude": 2.2,
-        "altitude": 100,
-        "timezone": 1,
-        "DST": "DST",
-        "tz": "tz/tz",
-        "type": "airport",
-        "source": "data"
-    }

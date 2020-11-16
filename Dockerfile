@@ -6,5 +6,6 @@ LABEL E-mail="alexdotordp@gmail.com"
 RUN mkdir /app
 ADD . app/
 WORKDIR /app
+ENV PYTHONPATH=/app
 RUN pip install -r requirements.txt
 EXPOSE 5000
