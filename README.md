@@ -1,5 +1,5 @@
-# passnfly_test
-Pasnnfly technical test
+# Flask project
+Using RestX
 
 ## build
 docker-compose build
